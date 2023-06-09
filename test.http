@@ -1,0 +1,31 @@
+@serial_number={{$dotenv SERIAL_NUMBER}}
+@api_key={{$dotenv API_KEY}}
+
+GET  https://s18.myenergi.net/cgi-jday-Z{{serial_number}}-2023-06-04
+Authorization: Digest {{serial_number}} {{api_key}}
+
+###
+
+# https://github.com/G6EJD/MyEnergi-Python-Example/blob/main/ME_Query%20-%20Example.py#L5-L11
+# See also https://github.com/twonk/MyEnergi-App-Api for explanations of responses (This also includes URLs for changing settings)
+
+GET  https://s18.myenergi.net/cgi-jstatus-Z
+Authorization: Digest {{serial_number}} {{api_key}}
+
+
+###
+
+GET  https://s18.myenergi.net/cgi-jstatus-H
+Authorization: Digest {{serial_number}} {{api_key}}
+
+###
+
+GET  https://s18.myenergi.net/cgi-jstatus-*
+Authorization: Digest {{serial_number}} {{api_key}}
+
+###
+
+# Data aggregated by hour
+GET  https://s18.myenergi.net/cgi-jdayhour-Z{{serial_number}}-2023-06-04
+Authorization: Digest {{serial_number}} {{api_key}}
+
