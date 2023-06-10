@@ -7,6 +7,7 @@ import sqlite3
 
 load_dotenv(dotenv_path="../.env")
 
+default_start_date = os.getenv("DEFAULT_START_DATE", datetime.datetime.today().strftime('%Y-%m-%d'))
 
 def main():
     serial_number = os.getenv("SERIAL_NUMBER", None)
@@ -21,12 +22,30 @@ def main():
     with sqlite3.connect('home_energy.db') as conn:
         cursor = conn.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS energy (date text, imported real, exported real, generated real, zappi real, self_consumption real, usage real, property_usage real, voltage real, frequency real, PRIMARY KEY (date))")
+        conn.commit()
+
+        cursor.execute("SELECT MAX(date) FROM energy")
+        res = cursor.fetchall()
+        max_date= res[0][0]
+        print(f"Max date: {max_date}")
+
+        if max_date is None:
+            # no data - use default start date
+            start_date = datetime.datetime.strptime(default_start_date, '%Y-%m-%d').date()
+        else:
+            max_date = datetime.datetime.strptime(max_date, '%Y-%m-%d %H:%M:%S')
+            if max_date.hour == 23 and max_date.minute == 59:
+                # Have all of latest day's data - advance a day
+                start_date = max_date.date() + datetime.timedelta(days=1)
+            else:
+                # Still have data to collect for specified day
+                start_date = max_date.date()
 
         myenergi = MyEnergi(api_key, serial_number)
         print("Date, Imported, Exported, Generated, Zappi, Usage")
 
-        date = datetime.date(2023, 3, 1)
-        for i in range(0, 31 + 30 +31 +8):
+        date = start_date
+        while date <= datetime.date.today():
             day_data = myenergi.get_day_data(date=date)
             imported = 0
             exported = 0
