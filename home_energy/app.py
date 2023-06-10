@@ -8,6 +8,7 @@ import sqlite3
 load_dotenv(dotenv_path="../.env")
 
 default_start_date = os.getenv("DEFAULT_START_DATE", datetime.datetime.today().strftime('%Y-%m-%d'))
+database_path = os.getenv("DATABASE_PATH", "home_energy.db")
 
 def main():
     serial_number = os.getenv("SERIAL_NUMBER", None)
@@ -19,7 +20,7 @@ def main():
     if not api_key:
         raise ValueError("API_KEY not set")
     
-    with sqlite3.connect('home_energy.db') as conn:
+    with sqlite3.connect(database_path) as conn:
         cursor = conn.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS energy (date text, imported real, exported real, generated real, zappi real, self_consumption real, usage real, property_usage real, voltage real, frequency real, PRIMARY KEY (date))")
         conn.commit()
