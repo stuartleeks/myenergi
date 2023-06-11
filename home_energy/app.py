@@ -7,8 +7,8 @@ import sqlite3
 
 load_dotenv(dotenv_path="../.env")
 
-default_start_date = os.getenv("DEFAULT_START_DATE", datetime.datetime.today().strftime('%Y-%m-%d'))
 database_path = os.getenv("DATABASE_PATH", "home_energy.db")
+default_start_date = os.getenv("DEFAULT_START_DATE", "")
 
 def main():
     serial_number = os.getenv("SERIAL_NUMBER", None)
@@ -32,7 +32,10 @@ def main():
 
         if max_date is None:
             # no data - use default start date
-            start_date = datetime.datetime.strptime(default_start_date, '%Y-%m-%d').date()
+            if default_start_date:
+                start_date = datetime.datetime.strptime(default_start_date, '%Y-%m-%d').date()
+            else:
+                start_date = datetime.date.today()
         else:
             max_date = datetime.datetime.strptime(max_date, '%Y-%m-%d %H:%M:%S')
             if max_date.hour == 23 and max_date.minute == 59:
