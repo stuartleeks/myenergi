@@ -7,7 +7,7 @@ import sqlite3
 
 load_dotenv(dotenv_path="../.env")
 
-database_path = os.getenv("DATABASE_PATH", "home_energy.db")
+database_path = os.getenv("DATABASE_PATH", "./home_energy.db")
 default_start_date = os.getenv("DEFAULT_START_DATE", "")
 
 def main():
@@ -20,6 +20,16 @@ def main():
     if not api_key:
         raise ValueError("API_KEY not set")
     
+    db_file = os.path.abspath(database_path)
+    print("db_file: ", db_file)
+    db_path = os.path.dirname(db_file)
+    print("db_path: ", db_path)
+    if not os.path.exists(db_path):
+        print(f"Creating database directory: '{db_path}'")
+        os.makedirs(db_path)
+    db_path_stat = os.stat(db_path)
+    print ("db path mode: ", oct(db_path_stat.st_mode))
+
     print(f"Opening database: '{database_path}'")
     with sqlite3.connect(database_path) as conn:
         cursor = conn.cursor()
