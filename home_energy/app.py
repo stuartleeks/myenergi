@@ -20,6 +20,7 @@ def main():
     if not api_key:
         raise ValueError("API_KEY not set")
     
+    print(f"Opening database: '{database_path}'")
     with sqlite3.connect(database_path) as conn:
         cursor = conn.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS energy (date text, imported real, exported real, generated real, zappi real, self_consumption real, usage real, property_usage real, voltage real, frequency real, PRIMARY KEY (date))")
