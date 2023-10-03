@@ -53,6 +53,8 @@ def main():
 
         print(f"Opening database: '{db_file}'", flush=True)
         with sqlite3.connect(db_file) as conn:
+            conn.execute('pragma journal_mode=wal')
+            
             cursor = conn.cursor()
             cursor.execute("CREATE TABLE IF NOT EXISTS energy (date text, imported real, exported real, generated real, zappi real, self_consumption real, usage real, property_usage real, voltage real, frequency real, PRIMARY KEY (date))")
             conn.commit()
