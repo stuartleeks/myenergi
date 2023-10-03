@@ -57,6 +57,7 @@ def main():
             cursor.execute("CREATE TABLE IF NOT EXISTS energy (date text, imported real, exported real, generated real, zappi real, self_consumption real, usage real, property_usage real, voltage real, frequency real, PRIMARY KEY (date))")
             conn.commit()
 
+            cursor = conn.cursor()
             cursor.execute("SELECT MAX(date) FROM energy")
             res = cursor.fetchall()
             max_date= res[0][0]
@@ -82,6 +83,7 @@ def main():
 
             date = start_date
             while date <= datetime.date.today():
+                cursor = conn.cursor()
                 day_data = myenergi.get_day_data(date=date)
                 imported = 0
                 exported = 0
