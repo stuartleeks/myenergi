@@ -35,11 +35,13 @@ def main():
     db_path_stat = os.stat(db_path)
     print ("db path mode: ", oct(db_path_stat.st_mode), flush=True)
 
-    db_file_stat = os.stat(db_file)
-    print ("db file mode: ", oct(db_file_stat.st_mode), flush=True)
-    print ("db file owner: ", db_file_stat.st_uid, flush=True)
-    print ("db file group: ", db_file_stat.st_gid, flush=True)
-
+    if os.path.exists(db_file):
+        db_file_stat = os.stat(db_file)
+        print ("db file mode: ", oct(db_file_stat.st_mode), flush=True)
+        print ("db file owner: ", db_file_stat.st_uid, flush=True)
+        print ("db file group: ", db_file_stat.st_gid, flush=True)
+    else :
+        print(f"Database file does not exist: '{db_file}'")
 
 
     lock_filename=db_file + ".lock"
