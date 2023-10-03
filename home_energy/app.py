@@ -31,6 +31,10 @@ def main():
     db_path_stat = os.stat(db_path)
     print ("db path mode: ", oct(db_path_stat.st_mode), flush=True)
 
+    db_file_stat = os.stat(db_file)
+    print ("db file mode: ", oct(db_file_stat.st_mode), flush=True)
+
+
     lock_filename=db_file + ".lock"
     print("Getting file lock: ", lock_filename, flush=True)
 
