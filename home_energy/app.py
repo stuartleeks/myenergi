@@ -20,7 +20,11 @@ def main():
 
     if not api_key:
         raise ValueError("API_KEY not set")
-    
+
+    # show current user and group
+    print("Current user: ", os.getuid(), flush=True)
+    print("Current group: ", os.getgid(), flush=True)
+
     db_file = os.path.abspath(database_path)
     print("db_file: ", db_file, flush=True)
     db_path = os.path.dirname(db_file)
@@ -33,6 +37,9 @@ def main():
 
     db_file_stat = os.stat(db_file)
     print ("db file mode: ", oct(db_file_stat.st_mode), flush=True)
+    print ("db file owner: ", db_file_stat.st_uid, flush=True)
+    print ("db file group: ", db_file_stat.st_gid, flush=True)
+
 
 
     lock_filename=db_file + ".lock"
