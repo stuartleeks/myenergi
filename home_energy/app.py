@@ -83,6 +83,7 @@ def main():
             date = date + datetime.timedelta(days=1)
             conn.commit()
 
+    print("Done", flush=True)
 
 if __name__ == "__main__":
     main()
