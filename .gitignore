@@ -4,3 +4,8 @@
 __pycache__
 
 home_energy.db
+
+output.json
+
+
+azuredeploy.parameters.json
