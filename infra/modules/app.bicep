@@ -20,6 +20,31 @@ resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-12-01-previ
   }
 }
 
+resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
+  name: 'homeenergistorage'
+  location: location
+  sku: {
+    name: 'Standard_LRS'
+  }
+  kind: 'StorageV2'
+  properties: {
+    accessTier: 'Hot'
+  }
+}
+resource files 'Microsoft.Storage/storageAccounts/fileServices@2022-09-01' = {
+  parent: storageAccount
+  name: 'default'
+  properties: {}
+}
+resource share 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-09-01' = {
+  parent: files
+  name: 'homeenergishare'
+  properties: {
+    enabledProtocols: 'SMB'
+    shareQuota: 1
+  }
+}
+
 resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-03-01' = {
   name: 'home-energi'
   location: location
@@ -32,9 +57,21 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-03-01' = {
       }
     }
   }
+  resource storage 'storages@2023-04-01-preview' = {
+    name: 'homeenergistorage'
+    properties: {
+      azureFile: {
+        shareName: share.name
+        accountName: storageAccount.name
+        accountKey: storageAccount.listKeys().keys[0].value
+        accessMode: 'ReadWrite'
+      }
+    }
+  }
 }
 
-resource myernergiApp 'Microsoft.App/jobs@2022-11-01-preview' = {
+resource myernergiApp 'Microsoft.App/jobs@2023-05-01' = {
+  // resource myernergiApp 'Microsoft.App/jobs@2023-05-02-preview' = {
   name: 'myenergi'
   location: location
   // identity ?
@@ -54,6 +91,14 @@ resource myernergiApp 'Microsoft.App/jobs@2022-11-01-preview' = {
     }
 
     template: {
+      volumes: [
+        {
+          name: 'homeenergistorage-volume'
+          storageName: 'homeenergistorage'
+          storageType: 'AzureFile'
+          mountOptions: 'uid=1000,gid=1000,nobrl,mfsymlinks,cache=none'
+        }
+      ]
       containers: [
         {
           name: 'myenergi'
@@ -74,6 +119,16 @@ resource myernergiApp 'Microsoft.App/jobs@2022-11-01-preview' = {
             {
               name: 'DEFAULT_START_DATE'
               value: myenergiDefaultStartDate
+            }
+            {
+              name: 'DATABASE_PATH'
+              value: '/var/local/homeenergistorage/home_energy.db'
+            }
+          ]
+          volumeMounts: [
+            {
+              volumeName: 'homeenergistorage-volume'
+              mountPath: '/var/local/homeenergistorage/'
             }
           ]
         }
